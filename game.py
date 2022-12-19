@@ -5,14 +5,14 @@ import threading
 
 from config import *
 
-
 class Game:
     def __init__(self):
         self.screen = pygame.display.set_mode((HEIGHT, WIDTH))
         self.matrix = Matrix(HEIGHT//AUTOMATON_SIZE, WIDTH//AUTOMATON_SIZE)
         self.handler_event = threading.Thread(target=self.handle_event)
         self.handler_event.start()
-        self.clicking = False
+        self.lclicking = False
+        self.rclicking = False
         self.game = False
 
     def run(self):
@@ -21,9 +21,12 @@ class Game:
             if not self.handler_event.is_alive():
                 raise SystemExit
             self.draw()
-            if self.clicking:
+            if self.lclicking:
                 # draw automaton on the matrix
                 self.matrix.draw()
+            elif self.rclicking:
+                # erease automaton on the matrix
+                self.matrix.erease()
             if self.game:
                 # Automaton can evolve
                 time.sleep(TIME_SLEEP)
@@ -48,13 +51,20 @@ class Game:
                         elif event.key == pygame.K_SPACE:
                             self.game = True
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    self.clicking = True
+                    if event.button == 1:
+                        self.lclicking = True
+                    elif event.button == 3:
+                        self.rclicking = True
                 elif event.type == pygame.MOUSEBUTTONUP:
-                    self.clicking = False
+                    if event.button == 1:
+                        self.lclicking = False
+                    elif event.button == 3:
+                        self.rclicking = False
 
     def draw(self):
         # draw automatons and update display
         self.draw_automaton()
+        self.draw_grid()
         pygame.display.update()
 
     def draw_automaton(self):
@@ -72,4 +82,10 @@ class Game:
             y_coordinate += AUTOMATON_SIZE
             x_coordinate = 0
 
-
+    def draw_grid(self):
+        for line in range(0, HEIGHT, AUTOMATON_SIZE):
+            pygame.draw.rect(self.screen, GRID_COLOR,
+                (line, 0, 1, HEIGHT))
+        for line in range(0, WIDTH, AUTOMATON_SIZE):
+            pygame.draw.rect(self.screen, GRID_COLOR,
+                (0, line, HEIGHT, 1))

@@ -81,3 +81,8 @@ class Matrix:
         # draw automatons starting from user input
         x, y = pygame.mouse.get_pos()
         self.matrix[y//AUTOMATON_SIZE][x//AUTOMATON_SIZE][0] = True
+
+    def erease(self):
+        #erease automatons
+        x, y = pygame.mouse.get_pos()
+        self.matrix[y//AUTOMATON_SIZE][x//AUTOMATON_SIZE][0] = False
